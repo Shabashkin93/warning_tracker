@@ -1,0 +1,79 @@
+package warning
+
+import (
+	"bufio"
+	"context"
+	"crypto/sha256"
+	"encoding/hex"
+	"strings"
+
+	"github.com/Shabashkin93/warning_tracker/internal/domain/warning"
+	"github.com/Shabashkin93/warning_tracker/internal/logging"
+	"github.com/Shabashkin93/warning_tracker/internal/project_errors"
+	"github.com/Shabashkin93/warning_tracker/internal/repository"
+
+	"github.com/microcosm-cc/bluemonday"
+)
+
+const (
+	warningString = ": warning:"
+	mainBranch    = "develop"
+)
+
+type service struct {
+	repos  *repository.Repository
+	sanity *bluemonday.Policy
+	logger *logging.LoggerEntry
+	ctx    context.Context
+}
+
+func NewService(ctx context.Context, sanityCfg interface{}, repos *repository.Repository, logger *logging.LoggerEntry) *service {
+	sanity := sanityCfg.(*bluemonday.Policy)
+	return &service{repos: repos, sanity: sanity, logger: logger, ctx: ctx}
+}
+
+func (s *service) sanitize(in *warning.WarningCreate) {
+	in.Branch = s.sanity.Sanitize(in.Branch)
+	in.Commit = s.sanity.Sanitize(in.Commit)
+	in.CreatedBy = s.sanity.Sanitize(in.CreatedBy)
+	in.CreatedAt = s.sanity.Sanitize(in.CreatedAt)
+}
+
+func (s *service) Create(in *warning.WarningCreate) (result warning.WarningResponse, err error) {
+
+	s.sanitize(in)
+	scanner := bufio.NewScanner(in.BuildLog)
+	for scanner.Scan() {
+		if strings.Contains(scanner.Text(), warningString) {
+			hash := sha256.New()
+			hash.Write([]byte(scanner.Text()))
+			bs := hash.Sum(nil)
+			encryptWarnStr := hex.EncodeToString(bs)
+			_, err = s.repos.Cache.Get(encryptWarnStr)
+			if err == project_errors.CacheKeyNotFound {
+				/***************************************************************/
+				if in.Branch == mainBranch { /* Update warnings cache */
+					err = s.repos.Cache.Set(encryptWarnStr, "")
+					if err != nil {
+						s.logger.Error(s.ctx, err.Error())
+					}
+				}
+				/***************************************************************/
+				result.WarningList = append(result.WarningList, scanner.Text())
+			} else if err != nil {
+				s.logger.Error(s.ctx, err.Error())
+				return
+			}
+		}
+	}
+
+	in.Count = len(result.WarningList)
+	result.CountNewWarning = in.Count
+	result.ID, err = s.repos.Warning.Create(in)
+	if err != nil {
+		s.logger.Error(s.ctx, err.Error())
+		return
+	}
+
+	return
+}
