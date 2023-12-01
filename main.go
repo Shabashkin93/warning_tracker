@@ -7,10 +7,12 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"github.com/Shabashkin93/warning_tracker/internal/config"
 	"github.com/Shabashkin93/warning_tracker/internal/logging"
 	"github.com/Shabashkin93/warning_tracker/internal/repository"
+	"github.com/Shabashkin93/warning_tracker/internal/repository/cache/redis"
 	db "github.com/Shabashkin93/warning_tracker/internal/repository/postgres"
 	"github.com/Shabashkin93/warning_tracker/internal/service"
 	transport "github.com/Shabashkin93/warning_tracker/internal/transport/http"
@@ -30,7 +32,12 @@ func main() {
 		logger.Fatal(ctx, "Could not set up database", slog.String("error", fmt.Sprintf("%v", err)))
 	}
 
-	repos := repository.NewRepository(ctx, logger, cfg, &database)
+	cache, err := redis.Init(ctx, cfg.REDIS.Address, cfg.REDIS.Port, cfg.REDIS.Password, time.Duration(cfg.REDIS.Timeout))
+	if err != nil {
+		logger.Fatal(ctx, "Could not set up cache", slog.String("error", fmt.Sprintf("%v", err)))
+	}
+
+	repos := repository.NewRepository(ctx, logger, cfg, &database, &cache)
 	defer repos.Stop()
 
 	services := service.NewService(ctx, repos, logger)
