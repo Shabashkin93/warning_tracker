@@ -38,10 +38,6 @@ func SanityQuery(query string) (cleanQuery string) {
 	return
 }
 
-type DataBase interface {
-	Shutdown(ctx context.Context, logger logging.Logger)
-}
-
 func Initialize(ctx context.Context, logger logging.Logger, cfg *config.Config) (db Database, err error) {
 
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",

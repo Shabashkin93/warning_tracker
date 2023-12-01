@@ -9,14 +9,13 @@ import (
 	"github.com/Shabashkin93/warning_tracker/internal/config"
 	"github.com/Shabashkin93/warning_tracker/internal/logging"
 	"github.com/Shabashkin93/warning_tracker/internal/repository/cache"
-	db "github.com/Shabashkin93/warning_tracker/internal/repository/postgres"
 	"github.com/Shabashkin93/warning_tracker/internal/repository/postgres/status"
 	"github.com/Shabashkin93/warning_tracker/internal/repository/postgres/warning"
 )
 
 type Repository struct {
 	logger   logging.Logger
-	DataBase db.DataBase
+	DataBase DataBase
 	ctx      context.Context
 	Cache
 	Status
@@ -28,12 +27,7 @@ func (r *Repository) Stop() {
 	r.Cache.Shutdown()
 }
 
-func NewRepository(ctx context.Context, logger logging.Logger, cfg *config.Config) *Repository {
-	database, err := db.Initialize(ctx, logger, cfg)
-	if err != nil {
-		logger.Fatal(ctx, "Could not set up database", slog.String("error", fmt.Sprintf("%v", err)))
-	}
-
+func NewRepository(ctx context.Context, logger logging.Logger, cfg *config.Config, database DataBase) *Repository {
 	var cacheEntry *cache.Cache
 	cache, err := cache.Init(ctx, cfg.REDIS.Address, cfg.REDIS.Port, cfg.REDIS.Password, time.Duration(cfg.REDIS.Timeout))
 	if err != nil {
@@ -43,10 +37,10 @@ func NewRepository(ctx context.Context, logger logging.Logger, cfg *config.Confi
 
 	return &Repository{
 		logger:   logger,
-		DataBase: &database,
+		DataBase: database,
 		ctx:      ctx,
 		Cache:    cacheEntry,
-		Status:   status.NewRepository(&database, logger),
-		Warning:  warning.NewRepository(ctx, &database, cfg.DB.Schema+"."+cfg.DB.Table.Warning, logger, time.Duration(cfg.DB.Timeout)),
+		Status:   status.NewRepository(database, logger),
+		Warning:  warning.NewRepository(ctx, database, cfg.DB.Schema+"."+cfg.DB.Table.Warning, logger, time.Duration(cfg.DB.Timeout)),
 	}
 }

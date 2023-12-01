@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"os"
 	"os/signal"
 	"syscall"
@@ -10,6 +11,7 @@ import (
 	"github.com/Shabashkin93/warning_tracker/internal/config"
 	"github.com/Shabashkin93/warning_tracker/internal/logging"
 	"github.com/Shabashkin93/warning_tracker/internal/repository"
+	db "github.com/Shabashkin93/warning_tracker/internal/repository/postgres"
 	"github.com/Shabashkin93/warning_tracker/internal/service"
 	transport "github.com/Shabashkin93/warning_tracker/internal/transport/http"
 )
@@ -23,7 +25,12 @@ func main() {
 
 	cfg := config.GetConfig(ctx, logger)
 
-	repos := repository.NewRepository(ctx, logger, cfg)
+	database, err := db.Initialize(ctx, logger, cfg)
+	if err != nil {
+		logger.Fatal(ctx, "Could not set up database", slog.String("error", fmt.Sprintf("%v", err)))
+	}
+
+	repos := repository.NewRepository(ctx, logger, cfg, &database)
 	defer repos.Stop()
 
 	services := service.NewService(ctx, repos, logger)
