@@ -15,7 +15,7 @@ type Service struct {
 	Warning
 }
 
-func NewService(ctx context.Context, repos *repository.Repository, logger *logging.LoggerEntry) *Service {
+func NewService(ctx context.Context, repos *repository.Repository, logger logging.Logger) *Service {
 	sanity := bluemonday.UGCPolicy()
 	return &Service{
 		Status:  status.NewService(repos),

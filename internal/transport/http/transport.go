@@ -19,7 +19,7 @@ import (
 const versionApi = "/v1"
 
 type Transport struct {
-	logger *logging.LoggerEntry
+	logger logging.Logger
 	Status
 	Warning
 	handler http.Handler
@@ -27,15 +27,15 @@ type Transport struct {
 	ctx     context.Context
 }
 
-func NewTransport(ctx context.Context, service *service.Service, logger *logging.LoggerEntry, cfg *config.Config) *Transport {
-	handler := server.Init(logger)
+func NewTransport(ctx context.Context, service *service.Service, logger logging.Logger, cfg *config.Config) *Transport {
+	handler := server.Init(ctx, logger)
 	server := &http.Server{
 		Handler: handler,
 	}
 	return &Transport{
 		logger:  logger,
-		Status:  status.NewTransport(service, handler, cfg.HTTP.URL.Status, cfg.IsDebug),
-		Warning: warning.NewTransport(service, handler, cfg.HTTP.URL.Warning, cfg.IsDebug),
+		Status:  status.NewTransport(ctx, service, handler, cfg.HTTP.URL.Status, cfg.IsDebug),
+		Warning: warning.NewTransport(ctx, service, handler, cfg.HTTP.URL.Warning, cfg.IsDebug),
 		handler: handler,
 		server:  server,
 		ctx:     ctx,

@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	logger "github.com/Shabashkin93/warning_tracker/internal/logging/slog"
+	"github.com/Shabashkin93/warning_tracker/internal/logging/slog"
 )
 
 type Logger interface {
@@ -27,7 +27,7 @@ func (logger *LoggerEntry) Stop() {
 }
 
 func NewLogger() *LoggerEntry {
-	logger, handler, logfile := logger.NewLogger()
+	logger, handler, logfile := slog.NewLogger()
 	return &LoggerEntry{
 		Logger:  logger,
 		Handler: handler,

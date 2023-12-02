@@ -1,6 +1,7 @@
 package status
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/Shabashkin93/warning_tracker/internal/service"
@@ -16,7 +17,7 @@ type transport struct {
 	url     string
 }
 
-func NewTransport(service *service.Service, i interface{}, url string, debug bool) *transport {
+func NewTransport(ctx context.Context, service *service.Service, i interface{}, url string, debug bool) *transport {
 	handler := i.(*gin.Engine)
 	return &transport{service: service, handler: handler, debug: debug, url: url}
 }

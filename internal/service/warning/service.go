@@ -23,11 +23,11 @@ const (
 type service struct {
 	repos  *repository.Repository
 	sanity *bluemonday.Policy
-	logger *logging.LoggerEntry
+	logger logging.Logger
 	ctx    context.Context
 }
 
-func NewService(ctx context.Context, sanityCfg interface{}, repos *repository.Repository, logger *logging.LoggerEntry) *service {
+func NewService(ctx context.Context, sanityCfg interface{}, repos *repository.Repository, logger logging.Logger) *service {
 	sanity := sanityCfg.(*bluemonday.Policy)
 	return &service{repos: repos, sanity: sanity, logger: logger, ctx: ctx}
 }

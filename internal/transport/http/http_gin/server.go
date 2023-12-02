@@ -1,14 +1,16 @@
 package http_gin
 
 import (
+	"context"
+
 	"github.com/Shabashkin93/warning_tracker/internal/logging"
-	"github.com/Shabashkin93/warning_tracker/internal/logging/slog"
+	"github.com/Shabashkin93/warning_tracker/internal/transport/http/http_gin/slog_gin"
 
 	"github.com/gin-gonic/gin"
 )
 
-func Init(logger *logging.LoggerEntry) (handler *gin.Engine) {
+func Init(ctx context.Context, logger logging.Logger) (handler *gin.Engine) {
 	handler = gin.New()
-	handler.Use(slog.GinLogger(logger.Handler), gin.Recovery())
+	handler.Use(slog_gin.GinLogger(ctx, logger), gin.Recovery())
 	return
 }

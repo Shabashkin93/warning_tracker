@@ -1,9 +1,11 @@
-package slog
+package slog_gin
 
 import (
+	"context"
 	"log/slog"
 	"time"
 
+	"github.com/Shabashkin93/warning_tracker/internal/logging"
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 )
@@ -22,8 +24,7 @@ type fields struct {
 	UserAgent       string
 }
 
-func GinLogger(i interface{}) gin.HandlerFunc {
-	logger := i.(*slog.Logger)
+func GinLogger(ctx context.Context, logger logging.Logger) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		t := time.Now()
 
@@ -47,21 +48,21 @@ func GinLogger(i interface{}) gin.HandlerFunc {
 			UserAgent:       c.Request.UserAgent(),
 		}
 
-		logSwitch(logger, cData)
+		logSwitch(ctx, logger, cData)
 	}
 }
 
-func logSwitch(logger *slog.Logger, data *fields) {
+func logSwitch(ctx context.Context, logger logging.Logger, data *fields) {
 	switch {
 	case data.StatusCode >= 400 && data.StatusCode < 500:
 		{
-			logger.Warn(data.MsgStr, slog.String("method", data.Method), slog.String("path", data.Path), slog.String("resp_time", data.Duration.String()), slog.Int("status", data.StatusCode), slog.String("client_ip", data.ClientIP))
+			logger.Warn(ctx, data.MsgStr, slog.String("method", data.Method), slog.String("path", data.Path), slog.String("resp_time", data.Duration.String()), slog.Int("status", data.StatusCode), slog.String("client_ip", data.ClientIP))
 		}
 	case data.StatusCode >= 500:
 		{
-			logger.Error(data.MsgStr, slog.String("method", data.Method), slog.String("path", data.Path), slog.String("resp_time", data.Duration.String()), slog.Int("status", data.StatusCode), slog.String("client_ip", data.ClientIP))
+			logger.Error(ctx, data.MsgStr, slog.String("method", data.Method), slog.String("path", data.Path), slog.String("resp_time", data.Duration.String()), slog.Int("status", data.StatusCode), slog.String("client_ip", data.ClientIP))
 		}
 	default:
-		logger.Info(data.MsgStr, slog.String("method", data.Method), slog.String("path", data.Path), slog.String("resp_time", data.Duration.String()), slog.Int("status", data.StatusCode), slog.String("client_ip", data.ClientIP))
+		logger.Info(ctx, data.MsgStr, slog.String("method", data.Method), slog.String("path", data.Path), slog.String("resp_time", data.Duration.String()), slog.Int("status", data.StatusCode), slog.String("client_ip", data.ClientIP))
 	}
 }
