@@ -6,15 +6,15 @@ import (
 	"github.com/Shabashkin93/warning_tracker/pkg/buildinfo"
 )
 
-type service struct {
+type usecase struct {
 	repos *repository.Repository
 }
 
-func NewService(repos *repository.Repository) *service {
-	return &service{repos: repos}
+func NewService(repos *repository.Repository) *usecase {
+	return &usecase{repos: repos}
 }
 
-func (s *service) GetAll() (dto *status.Status, code int, err error) {
+func (s *usecase) GetAll() (dto *status.Status, code int, err error) {
 	dto = &status.Status{}
 
 	buildinfo := buildinfo.GetBuildInfo()

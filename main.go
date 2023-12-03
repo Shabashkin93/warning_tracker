@@ -14,8 +14,8 @@ import (
 	"github.com/Shabashkin93/warning_tracker/internal/repository"
 	"github.com/Shabashkin93/warning_tracker/internal/repository/cache/redis"
 	db "github.com/Shabashkin93/warning_tracker/internal/repository/postgres"
-	"github.com/Shabashkin93/warning_tracker/internal/service"
 	transport "github.com/Shabashkin93/warning_tracker/internal/transport/http"
+	"github.com/Shabashkin93/warning_tracker/internal/usecase"
 )
 
 func main() {
@@ -40,9 +40,9 @@ func main() {
 	repos := repository.NewRepository(ctx, logger, cfg, &database, &cache)
 	defer repos.Stop()
 
-	services := service.NewService(ctx, repos, logger)
+	usecases := usecase.NewService(ctx, repos, logger)
 
-	transport := transport.NewTransport(ctx, services, logger, cfg)
+	transport := transport.NewTransport(ctx, usecases, logger, cfg)
 	transport.StartServer(cfg)
 	defer transport.Stop()
 

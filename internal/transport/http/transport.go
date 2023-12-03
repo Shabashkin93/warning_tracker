@@ -10,10 +10,10 @@ import (
 
 	"github.com/Shabashkin93/warning_tracker/internal/config"
 	"github.com/Shabashkin93/warning_tracker/internal/logging"
-	"github.com/Shabashkin93/warning_tracker/internal/service"
 	server "github.com/Shabashkin93/warning_tracker/internal/transport/http/http_gin"
 	"github.com/Shabashkin93/warning_tracker/internal/transport/http/http_gin/status"
 	"github.com/Shabashkin93/warning_tracker/internal/transport/http/http_gin/warning"
+	"github.com/Shabashkin93/warning_tracker/internal/usecase"
 )
 
 const versionApi = "/v1"
@@ -27,15 +27,15 @@ type Transport struct {
 	ctx     context.Context
 }
 
-func NewTransport(ctx context.Context, service *service.Service, logger logging.Logger, cfg *config.Config) *Transport {
+func NewTransport(ctx context.Context, usecase *usecase.Service, logger logging.Logger, cfg *config.Config) *Transport {
 	handler := server.Init(ctx, logger)
 	server := &http.Server{
 		Handler: handler,
 	}
 	return &Transport{
 		logger:  logger,
-		Status:  status.NewTransport(ctx, service, handler, cfg.HTTP.URL.Status, cfg.IsDebug),
-		Warning: warning.NewTransport(ctx, service, handler, cfg.HTTP.URL.Warning, cfg.IsDebug),
+		Status:  status.NewTransport(ctx, usecase.Status, handler, cfg.HTTP.URL.Status, cfg.IsDebug),
+		Warning: warning.NewTransport(ctx, usecase.Warning, handler, cfg.HTTP.URL.Warning, cfg.IsDebug),
 		handler: handler,
 		server:  server,
 		ctx:     ctx,

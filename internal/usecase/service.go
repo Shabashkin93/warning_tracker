@@ -1,12 +1,12 @@
-package service
+package usecase
 
 import (
 	"context"
 
 	"github.com/Shabashkin93/warning_tracker/internal/logging"
 	"github.com/Shabashkin93/warning_tracker/internal/repository"
-	"github.com/Shabashkin93/warning_tracker/internal/service/status"
-	"github.com/Shabashkin93/warning_tracker/internal/service/warning"
+	"github.com/Shabashkin93/warning_tracker/internal/usecase/status"
+	"github.com/Shabashkin93/warning_tracker/internal/usecase/warning"
 	"github.com/microcosm-cc/bluemonday"
 )
 

@@ -1,4 +1,4 @@
-package service
+package usecase
 
 import (
 	"github.com/Shabashkin93/warning_tracker/internal/domain/status"

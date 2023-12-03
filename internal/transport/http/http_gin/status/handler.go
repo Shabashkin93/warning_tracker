@@ -4,22 +4,26 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/Shabashkin93/warning_tracker/internal/service"
+	"github.com/Shabashkin93/warning_tracker/internal/domain/status"
 	"github.com/Shabashkin93/warning_tracker/internal/transport/http/http_gin/http_err"
 
 	"github.com/gin-gonic/gin"
 )
 
+type StatusService interface {
+	GetAll() (dto *status.Status, code int, err error)
+}
+
 type transport struct {
-	service *service.Service
+	usecase StatusService
 	handler *gin.Engine
 	debug   bool
 	url     string
 }
 
-func NewTransport(ctx context.Context, service *service.Service, i interface{}, url string, debug bool) *transport {
+func NewTransport(ctx context.Context, usecase StatusService, i interface{}, url string, debug bool) *transport {
 	handler := i.(*gin.Engine)
-	return &transport{service: service, handler: handler, debug: debug, url: url}
+	return &transport{usecase: usecase, handler: handler, debug: debug, url: url}
 }
 
 func (t *transport) Register(version string, i interface{}) {
@@ -33,7 +37,7 @@ func (t *transport) Register(version string, i interface{}) {
 
 func (t *transport) GetAll(c *gin.Context) {
 
-	statuss, code, err := t.service.Status.GetAll()
+	statuss, code, err := t.usecase.GetAll()
 	if err != nil {
 		if code == 0 {
 			code = http.StatusInternalServerError

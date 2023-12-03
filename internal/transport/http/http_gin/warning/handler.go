@@ -5,21 +5,24 @@ import (
 	"net/http"
 
 	"github.com/Shabashkin93/warning_tracker/internal/domain/warning"
-	"github.com/Shabashkin93/warning_tracker/internal/service"
 
 	"github.com/gin-gonic/gin"
 )
 
 type transport struct {
-	service *service.Service
+	usecase WarningService
 	handler *gin.Engine
 	debug   bool
 	url     string
 }
 
-func NewTransport(ctx context.Context, service *service.Service, i interface{}, url string, debug bool) *transport {
+type WarningService interface {
+	Create(in *warning.WarningCreate) (result warning.WarningResponse, err error)
+}
+
+func NewTransport(ctx context.Context, usecase WarningService, i interface{}, url string, debug bool) *transport {
 	handler := i.(*gin.Engine)
-	return &transport{service: service, handler: handler, debug: debug, url: url}
+	return &transport{usecase: usecase, handler: handler, debug: debug, url: url}
 }
 
 func (t *transport) Register(version string, i interface{}) {
@@ -46,7 +49,7 @@ func (t *transport) Create(c *gin.Context) {
 		return
 	}
 
-	result, err := t.service.Create(&entry)
+	result, err := t.usecase.Create(&entry)
 	if err != nil {
 		c.String(http.StatusInternalServerError, err.Error())
 		return
