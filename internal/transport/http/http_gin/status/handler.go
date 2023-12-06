@@ -6,6 +6,7 @@ import (
 
 	"github.com/Shabashkin93/warning_tracker/internal/domain/status"
 	"github.com/Shabashkin93/warning_tracker/internal/transport/http/http_gin/http_err"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	"github.com/gin-gonic/gin"
 )
@@ -28,6 +29,9 @@ func NewTransport(ctx context.Context, usecase StatusService, i interface{}, url
 
 func (t *transport) Register(version string, i interface{}) {
 	router := i.(*gin.Engine)
+
+	// Prometheus metrics
+	t.handler.GET("/metrics", gin.WrapH(promhttp.Handler()))
 
 	api := router.Group(version + t.url)
 	{
