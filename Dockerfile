@@ -20,6 +20,6 @@ FROM alpine
 RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
 COPY --from=builder /go/src/github.com/Shabashkin93/warning_tracker/main /usr/bin/github.com/Shabashkin93/warning_tracker
 
-EXPOSE 8080 8080
+EXPOSE ${SERVER_PORT} ${SERVER_PORT}
 
 ENTRYPOINT ["/usr/bin/github.com/Shabashkin93/warning_tracker"]

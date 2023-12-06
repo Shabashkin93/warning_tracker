@@ -33,7 +33,7 @@ type Config struct {
 		}
 	}
 	REDIS struct {
-		Address  string `env:"REDIS_ADDRESS" env-default:"192.168.3.165"`
+		Address  string `env:"REDIS_ADDRESS" env-default:"0.0.0.0"`
 		Port     string `env:"REDIS_PORT" env-default:"6379"`
 		Password string `env:"REDIS_PASSWORD" env-default:"admin"`
 		Timeout  int    `env:"REDIS_TIMEOUT" env-default:"2"`

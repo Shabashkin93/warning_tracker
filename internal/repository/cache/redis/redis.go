@@ -4,6 +4,7 @@ import (
 	"context"
 	"time"
 
+	"github.com/Shabashkin93/warning_tracker/internal/logging"
 	"github.com/Shabashkin93/warning_tracker/internal/project_errors"
 	"github.com/go-redis/redis/v9"
 )
@@ -14,7 +15,7 @@ type Cache struct {
 	timeout time.Duration
 }
 
-func Init(ctx context.Context, address, port, password string, timeout time.Duration) (Cache, error) {
+func Init(ctx context.Context, logger logging.Logger, address, port, password string, timeout time.Duration) (Cache, error) {
 	client := Cache{}
 	client.Client = redis.NewClient(&redis.Options{
 		Addr:     address + ":" + port,
@@ -24,7 +25,13 @@ func Init(ctx context.Context, address, port, password string, timeout time.Dura
 	client.ctx = ctx
 	client.timeout = timeout
 
+	ctx, cancel := context.WithTimeout(ctx, time.Duration(timeout)*time.Second)
+	defer cancel()
+
 	_, err := client.Client.Ping(ctx).Result()
+	if err != nil {
+		logger.Info(ctx, "Cache connection established")
+	}
 
 	return client, err
 }

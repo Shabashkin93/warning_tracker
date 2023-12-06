@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log/slog"
 	"strings"
+	"time"
 
 	"github.com/Shabashkin93/warning_tracker/internal/config"
 	"github.com/Shabashkin93/warning_tracker/internal/logging"
@@ -43,10 +44,12 @@ func Initialize(ctx context.Context, logger logging.Logger, cfg *config.Config) 
 	dsn := fmt.Sprintf("host=%s port=%s user=%s password=%s dbname=%s sslmode=%s",
 		cfg.DB.Address, cfg.DB.Port, cfg.DB.User, cfg.DB.Password, cfg.DB.Db, cfg.DB.SslMode)
 
-	conn, err := sqlx.Connect("pgx", dsn)
+	ctx, cancel := context.WithTimeout(ctx, time.Duration(cfg.DB.Timeout)*time.Second)
+	defer cancel()
+
+	conn, err := sqlx.ConnectContext(ctx, "pgx", dsn)
 	if err != nil {
 		logger.Fatal(ctx, "Unable to connect to database", slog.String("error", fmt.Sprintf("%v", err)))
-
 	}
 
 	db.LoggerEntry = logger
