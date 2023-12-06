@@ -44,7 +44,7 @@ func NewRepository(ctx context.Context, i interface{}, tableName string, logger 
 		;
 	`, tableName)))
 	if err != nil {
-		logger.Fatal(ctx, err.Error())
+		logger.Fatal(ctx, "prepared statement for \"Create\"", slog.String("err", err.Error()))
 	}
 
 	table := &postgres.Table{

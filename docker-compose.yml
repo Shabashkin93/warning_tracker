@@ -4,7 +4,7 @@ services:
   cache:
     image: redis:alpine
     command: redis-server
-    restart: always
+    restart: on-failure:3
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
     volumes: 
@@ -19,14 +19,33 @@ services:
       - REDIS_PORT=${REDIS_PORT}
       - REDIS_BACKUP_TIME=${REDIS_BACKUP_TIME}
 
+  db:
+    image: postgres:alpine
+    env_file: .env
+    networks:
+      - default
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_SCHEMA=${POSTGRES_SCHEMA}
+      - POSTGRES_SSL_MODE=${POSTGRES_SSL_MODE}
+      - POSTGRES_PORT=${POSTGRES_PORT}
+    ports:
+      - ${POSTGRES_PORT}:${POSTGRES_PORT}
+    restart: on-failure:3
+    volumes:
+      - db:/var/lib/postgresql/data
+
   server:
-    restart: always
+    restart: no
     build:
       context: .
       dockerfile: Dockerfile
     env_file: .env
     depends_on:
       - cache
+      - db
     networks:
       - default
     ports:
@@ -35,8 +54,19 @@ services:
       - "./logs:/logs/"
     environment:
       - REDIS_ADDRESS=cache
+      - POSTGRES_ADDRESS=db
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - REDIS_PORT=${REDIS_PORT}
+      - REDIS_BACKUP_TIME=${REDIS_BACKUP_TIME}
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_SCHEMA=${POSTGRES_SCHEMA}
+      - POSTGRES_SSL_MODE=${POSTGRES_SSL_MODE}
+      - POSTGRES_PORT=${POSTGRES_PORT}
 
 volumes:
   redis:
   redis-config:
   cache:
+  db:

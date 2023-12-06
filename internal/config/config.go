@@ -16,9 +16,9 @@ type Config struct {
 		User     string `env:"POSTGRES_USER" env-default:"wtrack"`
 		Password string `env:"POSTGRES_PASSWORD" env-default:"wtrack"`
 		Db       string `env:"POSTGRES_DB" env-default:"PG_DATABASE"`
-		Port     string `env:"POSTGRES_PORT" env-default:"5434"`
+		Port     string `env:"POSTGRES_PORT" env-default:"5432"`
 		SslMode  string `env:"POSTGRES_SSL_MODE" env-default:"disable"`
-		Address  string `env:"POSTGRES_ADDRESS" env-default:"192.168.3.182"`
+		Address  string `env:"POSTGRES_ADDRESS" env-default:"0.0.0.0"`
 		Schema   string `env:"POSTGRES_SCHEMA" env-default:"warning_tracker"`
 		Timeout  int    `env:"POSTGRES_TIMEOUT" env-default:"2"`
 		Table    struct {
