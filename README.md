@@ -22,11 +22,5 @@ curl --request GET \
   --header 'User-Agent: insomnia/8.5.1'
 ```
 
-## Get metrics for Prometheus
-
-```bash
-curl --request GET \
-  --url http://${SERVER_ADDRESS}:${SERVER_PORT}/metrics \
-  --header 'User-Agent: insomnia/8.4.1' \
-  --header 'content-type: multipart/form-data'
-```
+## Default Prometheus address
+http://localhost:19090

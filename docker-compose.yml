@@ -65,6 +65,16 @@ services:
       - POSTGRES_SSL_MODE=${POSTGRES_SSL_MODE}
       - POSTGRES_PORT=${POSTGRES_PORT}
 
+  prometheus:
+      image: prom/prometheus:latest
+      restart: no
+      depends_on:
+        - server
+      volumes:
+        - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      ports:
+        - "19090:9090"
+
 volumes:
   redis:
   redis-config:

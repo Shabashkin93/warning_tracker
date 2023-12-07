@@ -10,7 +10,7 @@ commitFlags :=-X '$(repository)pkg/buildinfo.commitHash=$(shell git rev-parse --
 
 psqlBackupName :='${PROJECT_NAME}-$(shell hostname)-$(shell date +%Y.%m.%d.%H%M%S)'
 
-POSTGRES_NAME :='pg-${PROJECT_NAME}'
+POSTGRES_NAME :='${PROJECT_NAME}-db-1'
 postgresIP :='$(shell docker inspect -f '{{range.NetworkSettings.Networks}}{{.Gateway}}{{end}}' ${POSTGRES_NAME})'
 POSTGRES_HOST :=${postgresIP}
 INTERNAL_POSTGRES_PORT :=5432
