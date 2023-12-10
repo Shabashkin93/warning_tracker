@@ -18,7 +18,6 @@ type Logger interface {
 
 type LoggerEntry struct {
 	Logger
-	Handler interface{}
 	LogFile *os.File
 }
 
@@ -27,10 +26,9 @@ func (logger *LoggerEntry) Stop() {
 }
 
 func NewLogger() *LoggerEntry {
-	logger, handler, logfile := slog.NewLogger()
+	logger, logfile := slog.NewLogger()
 	return &LoggerEntry{
 		Logger:  logger,
-		Handler: handler,
 		LogFile: logfile,
 	}
 }
