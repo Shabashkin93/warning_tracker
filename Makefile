@@ -168,3 +168,9 @@ update-go-packages:
 
 generate:
 	go generate ./internal/...
+
+metrics-up:
+	@docker-compose --file ./metrics/docker-compose.yml up -d --build
+
+metrics-down:
+	@docker-compose --file ./metrics/docker-compose.yml down

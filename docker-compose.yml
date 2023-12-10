@@ -3,6 +3,7 @@ version: "3.8"
 services:
   cache:
     image: redis:alpine
+    container_name: ${PROJECT_NAME}-redis
     command: redis-server
     restart: on-failure:3
     ports:
@@ -21,6 +22,7 @@ services:
 
   db:
     image: postgres:alpine
+    container_name: ${PROJECT_NAME}-postgres
     env_file: .env
     networks:
       - default
@@ -38,6 +40,7 @@ services:
       - db:/var/lib/postgresql/data
 
   server:
+    container_name: ${PROJECT_NAME}-server
     restart: no
     build:
       context: .
@@ -64,16 +67,6 @@ services:
       - POSTGRES_SCHEMA=${POSTGRES_SCHEMA}
       - POSTGRES_SSL_MODE=${POSTGRES_SSL_MODE}
       - POSTGRES_PORT=${POSTGRES_PORT}
-
-  prometheus:
-      image: prom/prometheus:latest
-      restart: no
-      depends_on:
-        - server
-      volumes:
-        - ./prometheus.yml:/etc/prometheus/prometheus.yml
-      ports:
-        - "19090:9090"
 
 volumes:
   redis:
