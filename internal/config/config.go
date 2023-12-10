@@ -1,16 +1,14 @@
 package config
 
 import (
-	"context"
+	"fmt"
 	"sync"
-
-	"github.com/Shabashkin93/warning_tracker/internal/logging"
 
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
 type Config struct {
-	IsDebug  bool   `env:"DEBUG" env-default:"false" env-upd:"true"`
+	IsDebug  bool   `env:"INFO" env-default:"false" env-upd:"true"`
 	LogLevel string `env:"LOG_LEVEL" env-default:"info" env-upd:"true"`
 	DB       struct {
 		User     string `env:"POSTGRES_USER" env-default:"wtrack"`
@@ -44,15 +42,16 @@ var instance *Config
 
 var once sync.Once
 
-func GetConfig(ctx context.Context, logger logging.Logger) *Config {
+func GetConfig() (config *Config, err error) {
 	once.Do(func() {
-		logger.Info(ctx, "read configuration")
 		instance = &Config{}
-		if err := cleanenv.ReadEnv(instance); err != nil {
-			help, _ := cleanenv.GetDescription(instance, nil)
-			logger.Info(ctx, help)
-			logger.Fatal(ctx, err.Error())
+		if err = cleanenv.ReadEnv(instance); err != nil {
+			help, errDescr := cleanenv.GetDescription(instance, nil)
+			if errDescr == nil {
+				fmt.Println(help)
+			}
 		}
 	})
-	return instance
+	config = instance
+	return
 }

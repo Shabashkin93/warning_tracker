@@ -29,12 +29,21 @@ var levelNames = map[slog.Leveler]string{
 	LevelPanic: "PANIC",
 }
 
+var levelValues = map[string]slog.Leveler{
+	"DEBUG": LevelDebug,
+	"INFO":  LevelInfo,
+	"WARN":  LevelWarn,
+	"ERROR": LevelError,
+	"FATAL": LevelFatal,
+	"PANIC": LevelPanic,
+}
+
 type logger struct {
 	logger *slog.Logger
 }
 
-func NewLogger() (*logger, *os.File) {
-	initLogger()
+func NewLogger(logLevel string) (*logger, *os.File) {
+	initLogger(logLevel)
 	loggerEntry := getLogger()
 	return &logger{
 		logger: loggerEntry,
@@ -45,9 +54,14 @@ func getLogger() *slog.Logger {
 	return l
 }
 
-func initLogger() {
+func initLogger(logLevel string) {
+	levelVal, exists := levelValues[logLevel]
+	if !exists {
+		levelVal = LevelError
+	}
+
 	opts := &slog.HandlerOptions{
-		Level: LevelDebug,
+		Level: levelVal,
 		ReplaceAttr: func(groups []string, a slog.Attr) slog.Attr {
 			if a.Key == slog.LevelKey {
 				level := a.Value.Any().(slog.Level)
