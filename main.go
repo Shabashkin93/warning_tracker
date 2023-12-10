@@ -11,6 +11,7 @@ import (
 
 	"github.com/Shabashkin93/warning_tracker/internal/config"
 	"github.com/Shabashkin93/warning_tracker/internal/logging"
+	logger "github.com/Shabashkin93/warning_tracker/internal/logging/slog"
 	"github.com/Shabashkin93/warning_tracker/internal/repository"
 	"github.com/Shabashkin93/warning_tracker/internal/repository/cache/redis"
 	db "github.com/Shabashkin93/warning_tracker/internal/repository/postgres"
@@ -22,7 +23,9 @@ func main() {
 
 	var ctx = context.Background()
 
-	logger := logging.NewLogger()
+	loggerInt, logfile := logger.NewLogger()
+
+	logger := logging.NewLogger(loggerInt, logfile)
 	defer logger.Stop()
 
 	cfg := config.GetConfig(ctx, logger)
