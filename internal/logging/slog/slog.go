@@ -7,7 +7,7 @@ import (
 	"os"
 )
 
-var e *slog.Logger
+var l *slog.Logger
 
 var logfile *os.File
 
@@ -42,7 +42,7 @@ func NewLogger() (*logger, *os.File) {
 }
 
 func getLogger() *slog.Logger {
-	return e
+	return l
 }
 
 func initLogger() {
@@ -64,7 +64,7 @@ func initLogger() {
 	}
 
 	handler := slog.NewJSONHandler(os.Stdout, opts)
-	e = slog.New(handler)
+	l = slog.New(handler)
 	logfile = os.Stdout
 }
 
