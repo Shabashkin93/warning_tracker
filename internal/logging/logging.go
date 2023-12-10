@@ -3,8 +3,6 @@ package logging
 import (
 	"context"
 	"os"
-
-	"github.com/Shabashkin93/warning_tracker/internal/logging/slog"
 )
 
 type Logger interface {
@@ -25,8 +23,7 @@ func (logger *LoggerEntry) Stop() {
 	logger.LogFile.Close()
 }
 
-func NewLogger() *LoggerEntry {
-	logger, logfile := slog.NewLogger()
+func NewLogger(logger Logger, logfile *os.File) *LoggerEntry {
 	return &LoggerEntry{
 		Logger:  logger,
 		LogFile: logfile,
