@@ -33,12 +33,12 @@ type logger struct {
 	logger *slog.Logger
 }
 
-func NewLogger() (*logger, interface{}, *os.File) {
+func NewLogger() (*logger, *os.File) {
 	initLogger()
 	loggerEntry := getLogger()
 	return &logger{
 		logger: loggerEntry,
-	}, loggerEntry, logfile
+	}, logfile
 }
 
 func getLogger() *slog.Logger {
