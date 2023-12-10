@@ -23,12 +23,16 @@ func main() {
 
 	var ctx = context.Background()
 
-	loggerInt, logfile := logger.NewLogger()
+	cfg, err := config.GetConfig()
+	if err != nil {
+		slog.Error("Failed get config")
+		os.Exit(1)
+	}
+
+	loggerInt, logfile := logger.NewLogger(cfg.LogLevel)
 
 	logger := logging.NewLogger(loggerInt, logfile)
 	defer logger.Stop()
-
-	cfg := config.GetConfig(ctx, logger)
 
 	database, err := db.Initialize(ctx, logger, cfg)
 	if err != nil {

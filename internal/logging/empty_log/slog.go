@@ -15,7 +15,7 @@ type logger struct {
 	logger *slog.Logger
 }
 
-func NewLogger() (*logger, *os.File) {
+func NewLogger(logLevel string) (*logger, *os.File) {
 	loggerEntry := getLogger()
 	return &logger{
 		logger: loggerEntry,
