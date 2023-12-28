@@ -15,6 +15,7 @@ import (
 	db "github.com/Shabashkin93/warning_tracker/internal/repository/postgres"
 	transport "github.com/Shabashkin93/warning_tracker/internal/transport/http"
 	"github.com/Shabashkin93/warning_tracker/internal/usecase"
+	"github.com/Shabashkin93/warning_tracker/pkg/buildinfo"
 	"github.com/Shabashkin93/warning_tracker/pkg/logging"
 	logger "github.com/Shabashkin93/warning_tracker/pkg/logging/slog"
 )
@@ -34,6 +35,13 @@ func main() {
 	defer out.Close()
 
 	logger := logging.NewLogger(loggerEnt)
+
+	buildinfo := buildinfo.GetBuildInfo()
+	logger.Info(ctx, "buildinfo",
+		slog.String("version", buildinfo.Version),
+		slog.String("build time", buildinfo.BuildTime),
+		slog.String("commit", buildinfo.CommitHash),
+	)
 
 	database, err := db.Initialize(ctx, logger, cfg)
 	if err != nil {
