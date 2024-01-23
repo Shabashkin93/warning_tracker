@@ -9,7 +9,7 @@ import (
 	"time"
 
 	"github.com/Shabashkin93/warning_tracker/internal/config"
-	"github.com/Shabashkin93/warning_tracker/internal/logging"
+	"github.com/Shabashkin93/warning_tracker/pkg/logging"
 
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/jmoiron/sqlx"

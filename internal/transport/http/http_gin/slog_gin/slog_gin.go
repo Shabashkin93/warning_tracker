@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/Shabashkin93/warning_tracker/internal/logging"
+	"github.com/Shabashkin93/warning_tracker/pkg/logging"
 	"github.com/gin-contrib/requestid"
 	"github.com/gin-gonic/gin"
 )

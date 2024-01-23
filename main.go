@@ -10,13 +10,13 @@ import (
 	"time"
 
 	"github.com/Shabashkin93/warning_tracker/internal/config"
-	"github.com/Shabashkin93/warning_tracker/internal/logging"
-	logger "github.com/Shabashkin93/warning_tracker/internal/logging/slog"
 	"github.com/Shabashkin93/warning_tracker/internal/repository"
 	"github.com/Shabashkin93/warning_tracker/internal/repository/cache/redis"
 	db "github.com/Shabashkin93/warning_tracker/internal/repository/postgres"
 	transport "github.com/Shabashkin93/warning_tracker/internal/transport/http"
 	"github.com/Shabashkin93/warning_tracker/internal/usecase"
+	"github.com/Shabashkin93/warning_tracker/pkg/logging"
+	logger "github.com/Shabashkin93/warning_tracker/pkg/logging/slog"
 )
 
 func main() {
@@ -29,10 +29,11 @@ func main() {
 		os.Exit(1)
 	}
 
-	loggerInt, logfile := logger.NewLogger(cfg.LogLevel)
+	out := os.Stdout
+	loggerEnt := logger.NewLogger(cfg.LogLevel, out)
+	defer out.Close()
 
-	logger := logging.NewLogger(loggerInt, logfile)
-	defer logger.Stop()
+	logger := logging.NewLogger(loggerEnt)
 
 	database, err := db.Initialize(ctx, logger, cfg)
 	if err != nil {

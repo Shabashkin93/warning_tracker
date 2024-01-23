@@ -8,9 +8,9 @@ import (
 	"strings"
 
 	"github.com/Shabashkin93/warning_tracker/internal/domain/warning"
-	"github.com/Shabashkin93/warning_tracker/internal/logging"
 	"github.com/Shabashkin93/warning_tracker/internal/project_errors"
 	"github.com/Shabashkin93/warning_tracker/internal/repository"
+	"github.com/Shabashkin93/warning_tracker/pkg/logging"
 
 	"github.com/microcosm-cc/bluemonday"
 )

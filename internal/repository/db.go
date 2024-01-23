@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"github.com/Shabashkin93/warning_tracker/internal/logging"
+	"github.com/Shabashkin93/warning_tracker/pkg/logging"
 )
 
 type DataBase interface {
