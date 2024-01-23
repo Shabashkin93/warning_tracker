@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"github.com/Shabashkin93/warning_tracker/internal/domain/warning"
-	"github.com/Shabashkin93/warning_tracker/internal/logging"
 	"github.com/Shabashkin93/warning_tracker/internal/repository/postgres"
+	"github.com/Shabashkin93/warning_tracker/pkg/logging"
 	"github.com/pkg/errors"
 )
 

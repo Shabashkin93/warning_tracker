@@ -2,7 +2,6 @@ package logging
 
 import (
 	"context"
-	"os"
 )
 
 type Logger interface {
@@ -16,16 +15,11 @@ type Logger interface {
 
 type LoggerEntry struct {
 	Logger
-	LogFile *os.File
 }
 
-func (logger *LoggerEntry) Stop() {
-	logger.LogFile.Close()
-}
-
-func NewLogger(logger Logger, logfile *os.File) *LoggerEntry {
+// New logger instance
+func NewLogger(logger Logger) *LoggerEntry {
 	return &LoggerEntry{
-		Logger:  logger,
-		LogFile: logfile,
+		Logger: logger,
 	}
 }

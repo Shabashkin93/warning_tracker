@@ -9,11 +9,11 @@ import (
 	"time"
 
 	"github.com/Shabashkin93/warning_tracker/internal/config"
-	"github.com/Shabashkin93/warning_tracker/internal/logging"
 	server "github.com/Shabashkin93/warning_tracker/internal/transport/http/http_gin"
 	"github.com/Shabashkin93/warning_tracker/internal/transport/http/http_gin/status"
 	"github.com/Shabashkin93/warning_tracker/internal/transport/http/http_gin/warning"
 	"github.com/Shabashkin93/warning_tracker/internal/usecase"
+	"github.com/Shabashkin93/warning_tracker/pkg/logging"
 )
 
 const versionApi = "/v1"

@@ -4,8 +4,8 @@ import (
 	"context"
 	"time"
 
-	"github.com/Shabashkin93/warning_tracker/internal/logging"
 	"github.com/Shabashkin93/warning_tracker/internal/project_errors"
+	"github.com/Shabashkin93/warning_tracker/pkg/logging"
 	"github.com/redis/go-redis/v9"
 )
 

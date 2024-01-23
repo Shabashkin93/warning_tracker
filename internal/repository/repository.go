@@ -5,9 +5,9 @@ import (
 	"time"
 
 	"github.com/Shabashkin93/warning_tracker/internal/config"
-	"github.com/Shabashkin93/warning_tracker/internal/logging"
 	"github.com/Shabashkin93/warning_tracker/internal/repository/postgres/status"
 	"github.com/Shabashkin93/warning_tracker/internal/repository/postgres/warning"
+	"github.com/Shabashkin93/warning_tracker/pkg/logging"
 )
 
 type Repository struct {
