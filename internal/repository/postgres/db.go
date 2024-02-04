@@ -19,6 +19,7 @@ var ErrNoMatch = errors.New("not found")
 
 type Query struct {
 	Create *sqlx.NamedStmt
+	GetOne *sqlx.NamedStmt
 }
 
 type Table struct {
