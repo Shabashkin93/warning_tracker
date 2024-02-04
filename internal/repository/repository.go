@@ -20,8 +20,13 @@ type Repository struct {
 }
 
 func (r *Repository) Stop() {
-	r.DataBase.Shutdown(r.ctx, r.logger)
-	r.Cache.Shutdown()
+	if r.DataBase != nil {
+		r.DataBase.Shutdown(r.ctx, r.logger)
+	}
+
+	if r.Cache != nil {
+		r.Cache.Shutdown()
+	}
 }
 
 func NewRepository(ctx context.Context, logger logging.Logger, cfg *config.Config, database DataBase, cache Cache) *Repository {

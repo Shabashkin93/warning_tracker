@@ -1,13 +1,20 @@
-package warning_test
+package postgres_test
 
 import (
 	"context"
 	"fmt"
 	"log"
+	"log/slog"
 	"os"
 	"testing"
 	"time"
 
+	"github.com/Shabashkin93/warning_tracker/internal/config"
+	"github.com/Shabashkin93/warning_tracker/internal/domain/warning"
+	"github.com/Shabashkin93/warning_tracker/internal/repository"
+	db "github.com/Shabashkin93/warning_tracker/internal/repository/postgres"
+	"github.com/Shabashkin93/warning_tracker/pkg/logging"
+	logger "github.com/Shabashkin93/warning_tracker/pkg/logging/empty_log"
 	"github.com/golang-migrate/migrate/v4"
 	_ "github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
@@ -18,6 +25,7 @@ import (
 
 var conn *sqlx.DB
 var IPAddress string
+var repos *repository.Repository
 
 const (
 	POSTGRES_USER     = "wtrack"
@@ -38,6 +46,27 @@ func TestMain(m *testing.M) {
 	if err != nil {
 		log.Fatalf("Could not connect to Docker: %s", err)
 	}
+
+	var ctx = context.Background()
+
+	cfg, err := config.GetConfig()
+	if err != nil {
+		slog.Error("Failed get config")
+		os.Exit(1)
+	}
+
+	out := os.Stdout
+	loggerEnt := logger.NewLogger(cfg.LogLevel, out)
+	defer out.Close()
+
+	logger := logging.NewLogger(loggerEnt)
+
+	database, err := db.Initialize(ctx, logger, cfg)
+	if err != nil {
+		logger.Fatal(ctx, "Could not set up database", slog.String("error", fmt.Sprintf("%v", err)))
+	}
+
+	repos = repository.NewRepository(ctx, logger, cfg, &database, nil)
 
 	envArgs := []string{
 		fmt.Sprintf("POSTGRES_USER=%s", POSTGRES_USER),
@@ -91,6 +120,8 @@ func TestMain(m *testing.M) {
 		}
 	}(resource)
 
+	defer repos.Stop()
+
 	err = conn.Ping()
 	if err != nil {
 		log.Printf("Could not ping to database: %s", err)
@@ -98,7 +129,7 @@ func TestMain(m *testing.M) {
 	}
 
 	migr, err := migrate.New(
-		"file://../../../../db/migrations",
+		"file://../../../db/migrations",
 		fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=%s", POSTGRES_USER, POSTGRES_PASSWORD, IPAddress, POSTGRES_PORT, POSTGRES_DB, POSTGRES_SSL_MODE),
 	)
 
@@ -127,6 +158,17 @@ func TestMain(m *testing.M) {
 
 }
 
-func TestSomething(t *testing.T) {
-	assert.Equal(t, nil, nil, "tmp test for save correct import assert")
+func TestWarning(t *testing.T) {
+	in := &warning.WarningCreate{Branch: "develop", Commit: "beffe2b9a727c481c8a4896edb1783a054ac084c", Count: 1, CreatedBy: "Shabashkin", CreatedAt: "2023-12-06T20:07:41.137Z"}
+	id, err := repos.Warning.Create(in)
+	assert.Equal(t, err, nil, "failed create record in postgresql err:%v", err)
+
+	out := &warning.WarningCreate{Id: id}
+	err = repos.Warning.GetOne(out)
+	assert.Equal(t, err, nil, "failed get record from postgresql %v", err)
+	assert.Equal(t, out.Branch, "develop", "failed get record from postgresql: incorrect Branch field")
+	assert.Equal(t, out.Commit, "beffe2b9a727c481c8a4896edb1783a054ac084c", "failed get record from postgresql: incorrect Commit field")
+	assert.Equal(t, out.Count, 1, "failed get record from postgresql: incorrect count field")
+	assert.Equal(t, out.CreatedBy, "Shabashkin", "failed get record from postgresql: incorrect CreatedBy field")
+	assert.Equal(t, out.CreatedAt, "2023-12-06T20:07:41.137Z", "failed get record from postgresql: incorrect CreatedAt field")
 }

@@ -47,6 +47,23 @@ func NewRepository(ctx context.Context, i interface{}, tableName string, logger 
 		logger.Fatal(ctx, "prepared statement for \"Create\"", slog.String("err", err.Error()))
 	}
 
+	query.GetOne, err = database.Conn.PrepareNamed(postgres.SanityQuery(fmt.Sprintf(`
+			SELECT
+				id,
+				branch,
+				commit,
+				count,
+				created_by,
+				created_at
+			FROM
+				%s
+			WHERE
+				id = :id;
+		`, tableName)))
+	if err != nil {
+		logger.Fatal(ctx, "prepared statement for \"Get\"", slog.String("err", err.Error()))
+	}
+
 	table := &postgres.Table{
 		Name:  tableName,
 		Query: query,
@@ -85,5 +102,20 @@ func (r *repository) Create(in *warning.WarningCreate) (id string, err error) {
 		id = item.ID.String
 	}
 
+	return
+}
+
+func (r *repository) GetOne(out *warning.WarningCreate) (err error) {
+	item := pgWarning{}
+	domainToPgWarning(out, &item)
+
+	err = r.table.Query.GetOne.Get(&item, &item)
+	if err != nil {
+		r.logger.Error(r.ctx, "Postgres req", slog.String("table", r.table.Name), slog.String("item", fmt.Sprintf("%v", out)), slog.String("error", fmt.Sprintf("%v", err)))
+		err = errors.Errorf("repository/Get: Failed get from db Warning item")
+		return
+	}
+
+	warningToPg(&item, out)
 	return
 }
