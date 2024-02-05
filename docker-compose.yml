@@ -5,7 +5,7 @@ services:
     image: redis:alpine
     container_name: ${PROJECT_NAME}-redis
     command: redis-server
-    restart: on-failure:3
+    restart: always
     ports:
       - "${REDIS_PORT}:${REDIS_PORT}"
     volumes: 
@@ -35,13 +35,13 @@ services:
       - POSTGRES_PORT=${POSTGRES_PORT}
     ports:
       - ${POSTGRES_PORT}:${POSTGRES_PORT}
-    restart: on-failure:3
+    restart: always
     volumes:
       - db:/var/lib/postgresql/data
 
   server:
     container_name: ${PROJECT_NAME}-server
-    restart: no
+    restart: always
     build:
       context: .
       dockerfile: Dockerfile
