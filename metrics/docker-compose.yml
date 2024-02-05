@@ -3,7 +3,7 @@ services:
   prometheus:
     image: prom/prometheus:latest
     container_name: ${PROJECT_NAME}-prometheus
-    env_file: .env
+    env_file: ../.env
     restart: no
     volumes:
       - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
@@ -13,7 +13,7 @@ services:
   grafana:
     image: grafana/grafana-enterprise
     container_name: ${PROJECT_NAME}-grafana
-    env_file: .env
+    env_file: ../.env
     restart: always
     ports:
       - ${GRAFANA_PORT}:3000
