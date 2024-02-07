@@ -40,7 +40,7 @@ func (s *usecase) sanitize(in *warning.WarningCreate) {
 }
 
 func (s *usecase) Create(in *warning.WarningCreate) (result warning.WarningResponse, err error) {
-
+	uniqueHashStrings := make(map[string]string)
 	s.sanitize(in)
 	scanner := bufio.NewScanner(in.BuildLog)
 	for scanner.Scan() {
@@ -49,21 +49,27 @@ func (s *usecase) Create(in *warning.WarningCreate) (result warning.WarningRespo
 			hash.Write([]byte(scanner.Text()))
 			bs := hash.Sum(nil)
 			encryptWarnStr := hex.EncodeToString(bs)
-			_, err = s.repos.Cache.Get(encryptWarnStr)
-			if err == project_errors.CacheKeyNotFound {
-				/***************************************************************/
-				if in.Branch == mainBranch { /* Update warnings cache */
-					err = s.repos.Cache.Set(encryptWarnStr, "")
-					if err != nil {
-						s.logger.Error(s.ctx, err.Error())
-					}
-				}
-				/***************************************************************/
-				result.WarningList = append(result.WarningList, scanner.Text())
-			} else if err != nil {
-				s.logger.Error(s.ctx, err.Error())
-				return
+			if _, exist := uniqueHashStrings[encryptWarnStr]; !exist {
+				uniqueHashStrings[encryptWarnStr] = scanner.Text()
 			}
+		}
+	}
+
+	for hashString, warningString := range uniqueHashStrings {
+		_, err = s.repos.Cache.Get(hashString)
+		if err == project_errors.CacheKeyNotFound {
+			/***************************************************************/
+			if in.Branch == mainBranch { /* Update warnings cache */
+				err = s.repos.Cache.Set(hashString, "")
+				if err != nil {
+					s.logger.Error(s.ctx, err.Error())
+				}
+			}
+			/***************************************************************/
+			result.WarningList = append(result.WarningList, warningString)
+		} else if err != nil {
+			s.logger.Error(s.ctx, err.Error())
+			return
 		}
 	}
 
