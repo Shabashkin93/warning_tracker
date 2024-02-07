@@ -67,3 +67,11 @@ func (c Cache) Delete(key string) (err error) {
 	_, err = c.Client.Del(ctx, key).Result()
 	return
 }
+
+func (c Cache) DeleteAll() (err error) {
+	ctx, cancel := context.WithTimeout(c.ctx, c.timeout*time.Second)
+	defer cancel()
+
+	_, err = c.Client.FlushDB(ctx).Result()
+	return
+}
