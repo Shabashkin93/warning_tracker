@@ -55,21 +55,28 @@ func (s *usecase) Create(in *warning.WarningCreate) (result warning.WarningRespo
 		}
 	}
 
-	for hashString, warningString := range uniqueHashStrings {
-		_, err = s.repos.Cache.Get(hashString)
-		if err == project_errors.CacheKeyNotFound {
-			/***************************************************************/
-			if in.Branch == mainBranch { /* Update warnings cache */
-				err = s.repos.Cache.Set(hashString, "")
-				if err != nil {
-					s.logger.Error(s.ctx, err.Error())
-				}
-			}
-			/***************************************************************/
-			result.WarningList = append(result.WarningList, warningString)
-		} else if err != nil {
+	if in.Branch == mainBranch {
+		err = s.repos.Cache.DeleteAll()
+		if err != nil {
 			s.logger.Error(s.ctx, err.Error())
-			return
+		}
+
+		for hashString, warningString := range uniqueHashStrings {
+			err = s.repos.Cache.Set(hashString, "")
+			if err != nil {
+				s.logger.Error(s.ctx, err.Error())
+			}
+			result.WarningList = append(result.WarningList, warningString)
+		}
+	} else {
+		for hashString, warningString := range uniqueHashStrings {
+			_, err = s.repos.Cache.Get(hashString)
+			if err == project_errors.CacheKeyNotFound {
+				result.WarningList = append(result.WarningList, warningString)
+			} else if err != nil {
+				s.logger.Error(s.ctx, err.Error())
+				return
+			}
 		}
 	}
 
