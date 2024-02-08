@@ -4,4 +4,3 @@ certs/*
 logs/*
 internal/filters
 resources
-grafana
