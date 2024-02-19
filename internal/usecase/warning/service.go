@@ -20,26 +20,26 @@ const (
 	mainBranch    = "develop"
 )
 
-type usecase struct {
+type Usecase struct {
 	repos  *repository.Repository
 	sanity *bluemonday.Policy
 	logger logging.Logger
 	ctx    context.Context
 }
 
-func NewService(ctx context.Context, sanityCfg interface{}, repos *repository.Repository, logger logging.Logger) *usecase {
+func NewService(ctx context.Context, sanityCfg interface{}, repos *repository.Repository, logger logging.Logger) *Usecase {
 	sanity := sanityCfg.(*bluemonday.Policy)
-	return &usecase{repos: repos, sanity: sanity, logger: logger, ctx: ctx}
+	return &Usecase{repos: repos, sanity: sanity, logger: logger, ctx: ctx}
 }
 
-func (s *usecase) sanitize(in *warning.WarningCreate) {
+func (s *Usecase) sanitize(in *warning.WarningCreate) {
 	in.Branch = s.sanity.Sanitize(in.Branch)
 	in.Commit = s.sanity.Sanitize(in.Commit)
 	in.CreatedBy = s.sanity.Sanitize(in.CreatedBy)
 	in.CreatedAt = s.sanity.Sanitize(in.CreatedAt)
 }
 
-func (s *usecase) Create(in *warning.WarningCreate) (result warning.WarningResponse, err error) {
+func (s *Usecase) Create(in *warning.WarningCreate) (result warning.WarningResponse, err error) {
 	uniqueHashStrings := make(map[string]string)
 	s.sanitize(in)
 	scanner := bufio.NewScanner(in.BuildLog)
