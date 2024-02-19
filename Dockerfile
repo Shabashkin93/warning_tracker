@@ -1,4 +1,4 @@
-FROM golang:1.21.4-alpine as builder
+FROM golang:1.21.6-alpine as builder
 
 RUN apk add git
 RUN apk update && apk add ca-certificates && rm -rf /var/cache/apk/*
