@@ -10,12 +10,14 @@ type repository struct {
 	database *postgres.Database
 }
 
-func NewRepository(i interface{}, logger logging.Logger) *repository {
-	database := i.(*postgres.Database)
-	return &repository{
-		database: database,
-		logger:   logger,
+func NewRepository(i interface{}, logger logging.Logger) (repos *repository) {
+	if i != nil {
+		repos = &repository{}
+		database := i.(*postgres.Database)
+		repos.database = database
+		repos.logger = logger
 	}
+	return
 }
 
 func (r *repository) GetStatus() (bool, error) {

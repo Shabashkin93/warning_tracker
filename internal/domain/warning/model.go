@@ -3,6 +3,7 @@ package warning
 import "bytes"
 
 type WarningCreate struct {
+	Id        string
 	Branch    string
 	Commit    string
 	Count     int

@@ -174,3 +174,7 @@ metrics-up:
 
 metrics-down:
 	@docker-compose --file ./metrics/docker-compose.yml down
+
+tests:
+	@go clean -testcache
+	@go test ./...
