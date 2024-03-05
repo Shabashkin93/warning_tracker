@@ -1,73 +1,32 @@
-# Run MES system from zero
+# Curl requests
 
-# Postgresql
+## Create record
 
-In this project used postgresql database
-
-## Setup environment variables
-
-**POSTGRES_USER** - username using in db (in current time using one user without roles)
-
-**POSTGRES_PASSWORD** - password for used user
-
-**POSTGRES_DB** - database name
-
-**POSTGRES_PORT** - port for connect to postgres database
-
-**INTERNAL_POSTGRES_PORT** - deprecated in this project, must be delete
-
-**POSTGRES_SSL_MODE** - in current time using only "off" and not tested "on" mode, for using "on" needs create ssl cert and run server using thus arguments
-
-```docker-compose.yml
-version: "3.8"
-services:
-  postgres:
-    command: >
-      -c ssl=on
-      -c ssl_cert_file=/var/lib/postgresql/server.crt
-      -c ssl_key_file=/var/lib/postgresql/server.key
+```bash
+curl --request POST \
+  --url http://${SERVER_ADDRESS}:${SERVER_PORT}/v1/warning \
+  --header 'Content-Type: multipart/form-data' \
+  --header 'User-Agent: insomnia/8.5.1' \
+  --form commit=beffe2b9a727c481c8a4896edb1783a054ac084c \
+  --form branch=develop \
+  --form build_log=@/path_to_test_file/testfile \
+  --form created_by=Shabashkin \
+  --form created_at=2023-12-06T20:07:41.137Z
 ```
 
-## Run
+## Get status
 
-```sh
-make db-run
+```bash
+curl --request GET \
+  --url http://${SERVER_ADDRESS}:${SERVER_PORT}/v1/status \
+  --header 'User-Agent: insomnia/8.5.1'
 ```
 
-## Create backup
+## Get metrics for Prometheus
 
-```sh
-make db-backup
-```
-
-## Restore backup
-
-```sh
-make db-restore
-```
-
-## Migrate Util
-
-### Install
-
-```sh
-make migrate-install
-```
-
-### Usage
-
-#### UP
-
-Create base struct db stored in **db/000001_create_items_table.up.sql** file
-
-```sh
-make migrate-up
-```
-
-#### DOWN
-
-Drop database struct using **db/000001_delete_items_table.down.sql** file
-
-```sh
-make migrate-down
+```bash
+curl --request GET \
+  --url http://${SERVER_ADDRESS}:${SERVER_PORT}/metrics \
+  --header 'User-Agent: insomnia/8.4.1' \
+  --header 'content-type: multipart/form-data'
 ```
