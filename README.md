@@ -148,5 +148,76 @@ Correct response example
 }
 ```
 
-## Default Prometheus address
-http://localhost:19090
+# Execute
+## Example .env file
+```.env
+LOG_LEVEL=DEBUG
+POSTGRES_USER=wtrack
+POSTGRES_PASSWORD=wtrack
+POSTGRES_DB=PG_DATABASE
+POSTGRES_SCHEMA=warning_tracker
+POSTGRES_PORT=5432
+INTERNAL_POSTGRES_PORT=5432
+POSTGRES_SSL_MODE=disable
+SERVER_PORT=8090
+PROJECT_NAME=warning-tracker
+ACCESS_TOKEN_LIFETIME=5
+REDIS_ADDRESS=0.0.0.0
+REDIS_PASSWORD=admin
+REDIS_PORT=6379
+REDIS_BACKUP_TIME=60
+GRAFANA_PORT=3000
+PROMETHEUS_PORT=19090
+TZ=Asia/Yekaterinburg
+
+```
+
+## Preparation
+### Install migrate util and create needs postgresql structs
+```bash
+make migrate-install
+docker-compose up -d db
+make migrate-up
+docker stop warning-tracker-postgres
+```
+
+## Start Services
+### From sources
+#### Run
+```bash
+make up
+```
+#### Stop
+```bash
+make down
+```
+
+### Metrics
+#### Start
+```bash
+metrics-up
+```
+#### Stop
+```bash
+metrics-down
+```
+
+### From dockerhub image
+### Run
+```bash
+make cache-up
+make db-run
+docker pull shabashkin/warning-tracker-server:latest
+make backend-run
+```
+
+### Stop
+```bash
+backend-stop
+make db-stop
+make cache-down
+```
+# Example grafana
+Up diff not main and main branch warnings count\
+Down count warnings in develop branch
+![example](./example_grafana.png)
