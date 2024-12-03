@@ -8,8 +8,8 @@ import (
 )
 
 type Config struct {
-	IsDebug  bool   `env:"INFO" env-default:"false" env-upd:"true"`
-	LogLevel string `env:"LOG_LEVEL" env-default:"info" env-upd:"true"`
+	IsDebug  bool   `env:"DEBUG" env-default:"false" env-upd:"true"`
+	LogLevel string `env:"LOG_LEVEL" env-default:"INFO" env-upd:"true"`
 	DB       struct {
 		User     string `env:"POSTGRES_USER" env-default:"wtrack"`
 		Password string `env:"POSTGRES_PASSWORD" env-default:"wtrack"`
