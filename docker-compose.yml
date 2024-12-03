@@ -2,7 +2,7 @@ version: "3.8"
 
 services:
   cache:
-    image: redis:alpine
+    image: redis:7-alpine
     container_name: ${PROJECT_NAME}-redis
     command: redis-server
     restart: always
@@ -21,7 +21,7 @@ services:
       - REDIS_BACKUP_TIME=${REDIS_BACKUP_TIME}
 
   db:
-    image: postgres:alpine
+    image: postgres:16-alpine
     container_name: ${PROJECT_NAME}-postgres
     env_file: .env
     networks:
